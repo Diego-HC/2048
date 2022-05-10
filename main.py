@@ -1,5 +1,6 @@
 import pygame as pg
 import random as r
+import sys
 
 class Tile:
     def __init__(self, pos, val) -> None:
@@ -18,10 +19,20 @@ class Tile:
     def setVal(self, val):
         self.val = val
 
+    def drawTile(self, screen):
+        if self.val != 0:
+            tileRect = pg.draw.rect(screen, [255, 255, 0], pg.Rect(self.pos[1] * 180, self.pos[0] * 180, 180, 180))
+            # pg.draw.rect(screen, [255, 255, 0], pg.Rect(self.pos[1] * 180, self.pos[0] * 180, 180, 180))
+            text_surface_object = pg.font.SysFont('comicsans', 30).render(
+                        str(self.val), True, [0, 0, 0]
+                    )
+            text_rect = text_surface_object.get_rect(center=tileRect.center)
+            screen.blit(text_surface_object, text_rect)
+            pg.display.flip()
     
 
 class Board:
-    def __init__(self) -> None:
+    def __init__(self, screen) -> None:
         self.board = [
             [0, 0, 0, 0],
             [0, 0, 0, 0],
@@ -31,6 +42,8 @@ class Board:
         for y in range(len(self.board)):
             for x in range(len(self.board[y])):
                 self.board[y][x] = Tile([y, x], 0)
+
+        self.screen = screen
 
     def addTile(self):
         while True:    
@@ -45,6 +58,11 @@ class Board:
             for x in y:
                 print('  |  ' + str(x.getVal()), end='')
             print('  |\n')
+
+    def drawBoard(self):
+        for y in self.board:
+            for x in y:
+                x.drawTile(self.screen)
 
     def checkLost(self):
         for y in range(len(self.board)):
@@ -139,12 +157,57 @@ class Board:
                     
 
 if __name__ == '__main__':
+    pg.init()
+    size = width, height = 720, 720
+    speed = [0, 1]
+    grey = [47, 79, 79]
+    screen = pg.display.set_mode(size)
+    clock = pg.time.Clock()
+
     game = True
-    board = Board()
+    board = Board(screen)
+    board.addTile()
+    screen.fill(grey)
+    board.drawBoard()
+    pg.display.flip()
 
     while game:
-        board.addTile()
-        board.printBoard()
-        board.movement(input('Move (w/a/s/d): '))
-        game = board.checkLost()
-        
+
+        for event in pg.event.get():
+            if event.type == pg.QUIT: sys.exit()
+
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RIGHT:
+                    board.movement('d')
+                    board.addTile()
+                    screen.fill(grey)
+                    board.drawBoard()
+                    pg.display.flip()
+                    game = board.checkLost()
+
+                if event.key == pg.K_LEFT:
+                    board.movement('a')
+                    board.addTile()
+                    screen.fill(grey)
+                    board.drawBoard()
+                    pg.display.flip()
+                    game = board.checkLost()
+
+                if event.key == pg.K_UP:
+                    board.movement('w')
+                    board.addTile()
+                    screen.fill(grey)
+                    board.drawBoard()
+                    pg.display.flip()
+                    game = board.checkLost()
+
+
+                if event.key == pg.K_DOWN:
+                    board.movement('s')
+                    board.addTile()
+                    screen.fill(grey)
+                    board.drawBoard()
+                    pg.display.flip()
+                    game = board.checkLost()
+
+        clock.tick(30)
