@@ -21,7 +21,8 @@ class Tile:
 
     def drawTile(self, screen):
         if self.val != 0:
-            tileRect = pg.draw.rect(screen, [255, 255, 0], pg.Rect(self.pos[1] * 180, self.pos[0] * 180, 180, 180))
+            pg.draw.rect(screen, [204, 204, 0], pg.Rect(self.pos[1] * 180, self.pos[0] * 180, 180, 180))
+            tileRect = pg.draw.rect(screen, [255, 255, 0], pg.Rect(self.pos[1] * 180 + 10, self.pos[0] * 180 + 10, 160, 160))
             # pg.draw.rect(screen, [255, 255, 0], pg.Rect(self.pos[1] * 180, self.pos[0] * 180, 180, 180))
             text_surface_object = pg.font.SysFont('comicsans', 30).render(
                         str(self.val), True, [0, 0, 0]
@@ -82,8 +83,8 @@ class Board:
             [True, True, True, True],
             [True, True, True, True]
         ]
-
-        continueMove = 2
+        moved = False
+        continueMove = 1
 
         while continueMove != 0:
             if move == 'w':
@@ -93,6 +94,7 @@ class Board:
                             self.board[y - 1][x].setVal(self.board[y][x].getVal())
                             self.board[y][x].setVal(0)
                             continueMove = 2
+                            moved = True
 
                         elif self.board[y][x].getVal() != 0 and (mergeBoard[y - 1][x] == True) and (mergeBoard[y][x] == True) and (self.board[y - 1][x].getVal() == self.board[y][x].getVal()):
                             self.board[y - 1][x].setVal(self.board[y - 1][x].getVal() * 2)
@@ -100,6 +102,7 @@ class Board:
                             mergeBoard[y - 1][x] = False
                             mergeBoard[y][x] = False
                             continueMove = 2
+                            moved = True
 
                 continueMove -= 1
             
@@ -108,8 +111,9 @@ class Board:
                     for x in range(len(self.board[y])):
                         if self.board[y + 1][x].getVal() == 0 and self.board[y][x].getVal() != 0:
                             self.board[y + 1][x].setVal(self.board[y][x].getVal())
-                            #self.board[y][x].setVal(0)
+                            self.board[y][x].setVal(0)
                             continueMove = 2
+                            moved = True
 
                         elif self.board[y][x].getVal() != 0 and (mergeBoard[y + 1][x] == True) and (mergeBoard[y][x] == True) and (self.board[y + 1][x].getVal() == self.board[y][x].getVal()):
                             self.board[y + 1][x].setVal(self.board[y + 1][x].getVal() * 2)
@@ -117,6 +121,7 @@ class Board:
                             mergeBoard[y + 1][x] = False
                             #mergeBoard[y][x] = False
                             continueMove = 2
+                            moved = True
 
                 continueMove -= 1
 
@@ -125,8 +130,9 @@ class Board:
                     for x in range(1, len(self.board[y])):
                         if self.board[y][x - 1].getVal() == 0 and self.board[y][x].getVal() != 0:
                             self.board[y][x - 1].setVal(self.board[y][x].getVal())
-                            #self.board[y][x].setVal(0)
+                            self.board[y][x].setVal(0)
                             continueMove = 2
+                            moved = True
 
                         elif self.board[y][x].getVal() != 0 and (mergeBoard[y][x - 1] == True) and (mergeBoard[y][x] == True) and (self.board[y][x - 1].getVal() == self.board[y][x].getVal()):
                             self.board[y][x - 1].setVal(self.board[y][x].getVal() * 2)
@@ -134,6 +140,7 @@ class Board:
                             mergeBoard[y][x - 1] = False
                             #mergeBoard[y][x] = False
                             continueMove = 2
+                            moved = True
 
                 continueMove -= 1
 
@@ -144,6 +151,7 @@ class Board:
                             self.board[y][x + 1].setVal(self.board[y][x].getVal())
                             self.board[y][x].setVal(0)
                             continueMove = 2
+                            moved = True
 
                         elif self.board[y][x].getVal() != 0 and (mergeBoard[y][x + 1] == True) and (mergeBoard[y][x] == True) and (self.board[y][x + 1].getVal() == self.board[y][x].getVal()):
                             self.board[y][x + 1].setVal(self.board[y][x + 1].getVal() * 2)
@@ -151,8 +159,17 @@ class Board:
                             mergeBoard[y][x + 1] = False
                             #mergeBoard[y][x] = False
                             continueMove = 2
+                            moved = True
 
                 continueMove -= 1
+
+        if moved:
+            self.addTile()
+            self.screen.fill(grey)
+            self.drawBoard()
+            pg.display.flip()
+            
+        return self.checkLost()
 
                     
 
@@ -162,6 +179,10 @@ if __name__ == '__main__':
     speed = [0, 1]
     grey = [47, 79, 79]
     screen = pg.display.set_mode(size)
+    pg.display.set_caption('2048')
+    logo = pg.image.load('2048logo.jpg')
+    pg.display.set_icon(logo)
+
     clock = pg.time.Clock()
 
     game = True
@@ -172,42 +193,17 @@ if __name__ == '__main__':
     pg.display.flip()
 
     while game:
-
         for event in pg.event.get():
             if event.type == pg.QUIT: sys.exit()
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RIGHT:
-                    board.movement('d')
-                    board.addTile()
-                    screen.fill(grey)
-                    board.drawBoard()
-                    pg.display.flip()
-                    game = board.checkLost()
-
+                    game = board.movement('d')
                 if event.key == pg.K_LEFT:
-                    board.movement('a')
-                    board.addTile()
-                    screen.fill(grey)
-                    board.drawBoard()
-                    pg.display.flip()
-                    game = board.checkLost()
-
+                    game = board.movement('a')
                 if event.key == pg.K_UP:
-                    board.movement('w')
-                    board.addTile()
-                    screen.fill(grey)
-                    board.drawBoard()
-                    pg.display.flip()
-                    game = board.checkLost()
-
-
+                    game = board.movement('w')
                 if event.key == pg.K_DOWN:
-                    board.movement('s')
-                    board.addTile()
-                    screen.fill(grey)
-                    board.drawBoard()
-                    pg.display.flip()
-                    game = board.checkLost()
+                    game = board.movement('s')
 
         clock.tick(30)
