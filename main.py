@@ -23,23 +23,12 @@ class Tile:
         if self.val != 0:
             pg.draw.rect(screen, [204, 204, 0], pg.Rect(self.pos[1] * 120, self.pos[0] * 120, 120, 120))
             tileRect = pg.draw.rect(screen, [255, 255, 0], pg.Rect(self.pos[1] * 120 + 10, self.pos[0] * 120 + 10, 100, 100))
-            # pg.draw.rect(screen, [255, 255, 0], pg.Rect(self.pos[1] * 180, self.pos[0] * 180, 180, 180))
             text_surface_object = pg.font.SysFont('centurygothic', 30).render(
                         str(self.val), True, [0, 0, 0]
                     )
             text_rect = text_surface_object.get_rect(center=tileRect.center)
             screen.blit(text_surface_object, text_rect)
             pg.display.flip()
-
-    # def animateTile(self, screen, startPos, endPos):
-        # if startPos[0] != endPos[0]:
-        #     for pos in range(startPos[0], endPos[0]):
-        #         self.drawTile(screen, [pos, endPos[1]])
-        # else:
-        #     for pos in range(startPos[1], endPos[1]):
-        #         self.drawTile(screen, [endPos[0], pos])
-        
-    
 
 class Board:
     def __init__(self, screen) -> None:
@@ -53,7 +42,6 @@ class Board:
             for x in range(len(self.board[y])):
                 self.board[y][x] = Tile([y, x], 0)
 
-        # self.lastBoard = self.board
         self.screen = screen
 
     def addTile(self):
@@ -73,7 +61,7 @@ class Board:
     def drawBoard(self):
         for y in range(len(self.board)):
             for x in range(len(self.board[y])):
-                self.board[y][x].drawTile(self.screen)#, self.board[y][x].getPos())
+                self.board[y][x].drawTile(self.screen)
 
     def checkLost(self):
         for y in range(len(self.board)):
@@ -95,21 +83,18 @@ class Board:
         ]
         moved = False
         continueMove = 1
-        # self.lastBoard = self.board
-
+        
         while continueMove != 0:
             if move == 'w':
                 for y in range(1, len(self.board)):
                     for x in range(len(self.board[y])):
                         if self.board[y - 1][x].getVal() == 0 and self.board[y][x].getVal() != 0:
-                            # self.board[y][x].animateTile(self.screen, [y, x], [y - 1, x])
                             self.board[y - 1][x].setVal(self.board[y][x].getVal())
                             self.board[y][x].setVal(0)
                             continueMove = 2
                             moved = True
 
                         elif self.board[y][x].getVal() != 0 and (mergeBoard[y - 1][x] == True) and (mergeBoard[y][x] == True) and (self.board[y - 1][x].getVal() == self.board[y][x].getVal()):
-                            # self.board[y][x].animateTile(self.screen, [y, x], [y - 1, x])
                             self.board[y - 1][x].setVal(self.board[y - 1][x].getVal() * 2)
                             self.board[y][x].setVal(0)
                             mergeBoard[y - 1][x] = False
@@ -123,14 +108,12 @@ class Board:
                 for y in range(len(self.board) - 2, -1, -1):
                     for x in range(len(self.board[y])):
                         if self.board[y + 1][x].getVal() == 0 and self.board[y][x].getVal() != 0:
-                            # self.board[y][x].animateTile(self.screen, [y, x], [y + 1, x])
                             self.board[y + 1][x].setVal(self.board[y][x].getVal())
                             self.board[y][x].setVal(0)
                             continueMove = 2
                             moved = True
 
                         elif self.board[y][x].getVal() != 0 and (mergeBoard[y + 1][x] == True) and (mergeBoard[y][x] == True) and (self.board[y + 1][x].getVal() == self.board[y][x].getVal()):
-                            # self.board[y][x].animateTile(self.screen, [y, x], [y + 1, x])
                             self.board[y + 1][x].setVal(self.board[y + 1][x].getVal() * 2)
                             self.board[y][x].setVal(0)
                             mergeBoard[y + 1][x] = False
@@ -144,14 +127,12 @@ class Board:
                 for y in range(len(self.board)):
                     for x in range(1, len(self.board[y])):
                         if self.board[y][x - 1].getVal() == 0 and self.board[y][x].getVal() != 0:
-                            # self.board[y][x].animateTile(self.screen, [y, x], [y, x - 1])
                             self.board[y][x - 1].setVal(self.board[y][x].getVal())
                             self.board[y][x].setVal(0)
                             continueMove = 2
                             moved = True
 
                         elif self.board[y][x].getVal() != 0 and (mergeBoard[y][x - 1] == True) and (mergeBoard[y][x] == True) and (self.board[y][x - 1].getVal() == self.board[y][x].getVal()):
-                            # self.board[y][x].animateTile(self.screen, [y, x], [y, x - 1])
                             self.board[y][x - 1].setVal(self.board[y][x].getVal() * 2)
                             self.board[y][x].setVal(0)
                             mergeBoard[y][x - 1] = False
@@ -165,14 +146,12 @@ class Board:
                 for y in range(len(self.board)):
                     for x in range(len(self.board[y]) - 2, -1, -1):
                         if self.board[y][x + 1].getVal() == 0 and self.board[y][x].getVal() != 0:
-                            # self.board[y][x].animateTile(self.screen, [y, x], [y, x + 1])
                             self.board[y][x + 1].setVal(self.board[y][x].getVal())
                             self.board[y][x].setVal(0)
                             continueMove = 2
                             moved = True
 
                         elif self.board[y][x].getVal() != 0 and (mergeBoard[y][x + 1] == True) and (mergeBoard[y][x] == True) and (self.board[y][x + 1].getVal() == self.board[y][x].getVal()):
-                            # self.board[y][x].animateTile(self.screen, [y, x], [y, x + 1])
                             self.board[y][x + 1].setVal(self.board[y][x + 1].getVal() * 2)
                             self.board[y][x].setVal(0)
                             mergeBoard[y][x + 1] = False
